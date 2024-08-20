@@ -1,43 +1,56 @@
 import SwiftUI
 
 struct ContentView: View {
-    var activities = ["Archery","Baseball"]
-
-    @State var selected = "Baseball"
+    @State private var todo: String = ""
     
+    struct TodoType: Identifiable {
+        let id = UUID()
+        var text: String
+        var isDone: DarwinBoolean?
+    }
+
+    @State private var todoList: [TodoType] = []  // Empty initial state
+    
+      
     var body: some View {
- 
-        
-        VStack{
-            Text("My Swift App")
+        VStack {
+            Text("My Todo App")
                 .font(.headline)
                 .foregroundColor(Color.green)
                 .multilineTextAlignment(.center)
-                .padding(0.0)
-            
-              
-            
-            Circle()
-                .fill(.blue)
                 .padding()
-                .overlay(
-                    Image(systemName:"figure.\(selected.lowercased())").font(
-                        .system(size:144)
-                    ).foregroundColor(.white)
-                )
-            Text("\(selected)123").font(.system(size:30))
+            
+            HStack {
+                TextField("Add your todo", text: $todo).padding()
+                Button("Add") {
+                    if !todo.isEmpty {
+                        todoList.append(TodoType(text: todo))
+                        todo = ""
+                    }
+                }
+            }
+            .padding()
+            
+            List {
+                ForEach(todoList) { ac in
+                    VStack{
+                        Text(ac.text)
+                        Text("Hello")
+                        Button("Delete") {
+                          if let index = todoList.firstIndex(where: { $0.id == ac.id }) {
+                           todoList.remove(at: index)
+                                    }
+                               }
+                            .foregroundColor(.red)
+                    }
+                    
+                }.onDelete(perform: deleteItems)
+            }
 
         }
-        
-
-        
-        Button("Next") {
-            
-            withAnimation(.easeInOut(duration: 1)) {
-                selected = activities.randomElement() ?? "Archery"
-            }
-            
-        }.buttonStyle(.borderedProminent)
+    }
+    func deleteItems(at offsets: IndexSet) {
+        todoList.remove(atOffsets: offsets)
     }
 }
 
